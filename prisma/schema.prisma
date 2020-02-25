@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DB_URL")
+}
+
+model Album {
+  AlbumId  Int     @default(autoincrement()) @id
+  Title    String
+  ArtistId Artist
+  track    Track[]
+
+  @@index([ArtistId], name: "IFK_AlbumArtistId")
+}
+
+model Artist {
+  ArtistId Int     @default(autoincrement()) @id
+  Name     String?
+  album    Album[]
+}
+
+model Customer {
+  Address      String?
+  City         String?
+  Company      String?
+  Country      String?
+  CustomerId   Int       @default(autoincrement()) @id
+  Email        String
+  Fax          String?
+  FirstName    String
+  LastName     String
+  Phone        String?
+  PostalCode   String?
+  State        String?
+  SupportRepId Employee?
+  invoice      Invoice[]
+
+  @@index([SupportRepId], name: "IFK_CustomerSupportRepId")
+}
+
+model Employee {
+  Address    String?
+  BirthDate  DateTime?
+  City       String?
+  Country    String?
+  Email      String?
+  EmployeeId Int        @default(autoincrement()) @id
+  Fax        String?
+  FirstName  String
+  HireDate   DateTime?
+  LastName   String
+  Phone      String?
+  PostalCode String?
+  State      String?
+  Title      String?
+  ReportsTo  Employee?  @relation("EmployeeToEmployee_ReportsTo")
+  customer   Customer[]
+  employee   Employee[] @relation("EmployeeToEmployee_ReportsTo")
+
+  @@index([ReportsTo], name: "IFK_EmployeeReportsTo")
+}
+
+model Genre {
+  GenreId Int     @default(autoincrement()) @id
+  Name    String?
+  track   Track[]
+}
+
+model Invoice {
+  BillingAddress    String?
+  BillingCity       String?
+  BillingCountry    String?
+  BillingPostalCode String?
+  BillingState      String?
+  InvoiceDate       DateTime
+  InvoiceId         Int           @default(autoincrement()) @id
+  Total             Float
+  CustomerId        Customer
+  invoiceLine       InvoiceLine[]
+
+  @@index([CustomerId], name: "IFK_InvoiceCustomerId")
+}
+
+model InvoiceLine {
+  InvoiceLineId Int     @default(autoincrement()) @id
+  Quantity      Int
+  UnitPrice     Float
+  InvoiceId     Invoice
+  TrackId       Track
+
+  @@index([InvoiceId], name: "IFK_InvoiceLineInvoiceId")
+  @@index([TrackId], name: "IFK_InvoiceLineTrackId")
+}
+
+model MediaType {
+  MediaTypeId Int     @default(autoincrement()) @id
+  Name        String?
+  track       Track[]
+}
+
+model Playlist {
+  Name          String?
+  PlaylistId    Int             @default(autoincrement()) @id
+  playlistTrack PlaylistTrack[]
+}
+
+model PlaylistTrack {
+  Id         Int      @default(autoincrement()) @id
+  PlaylistId Playlist
+  TrackId    Track
+
+  @@index([TrackId], name: "IFK_PlaylistTrackTrackId")
+  @@unique([PlaylistId, TrackId], name: "Unique_PlaylistTrack")
+}
+
+model Track {
+  Bytes         Int?
+  Composer      String?
+  Milliseconds  Int
+  Name          String
+  TrackId       Int             @default(autoincrement()) @id
+  UnitPrice     Float
+  AlbumId       Album?
+  GenreId       Genre?
+  MediaTypeId   MediaType
+  invoiceLine   InvoiceLine[]
+  playlistTrack PlaylistTrack[]
+
+  @@index([AlbumId], name: "IFK_TrackAlbumId")
+  @@index([GenreId], name: "IFK_TrackGenreId")
+  @@index([MediaTypeId], name: "IFK_TrackMediaTypeId")
+}

@@ -1,12 +1,14 @@
 // Learn more about Begin HTTP functions: https://docs.begin.com/en/functions/http/
+import { PrismaClient } from '@prisma/client'
 
-export async function handler (req: object) {
-  console.log(req)
+const client = new PrismaClient()
+export async function handler(req: object) {
+  const albums = await client.album.findMany({ first: 5 })
   return {
-    status: 302,
+    status: 200,
     headers: {
-      'cache-control': 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
+      'content-type': 'application/json',
     },
-    location: '/'
+    body: { albums },
   }
 }

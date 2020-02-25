@@ -8,5 +8,9 @@
   "devDependencies": {
     "@architect/sandbox": "latest",
     "cross-env": "^7.0.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^2.0.0-alpha.832",
+    "prisma2": "^2.0.0-alpha.832"
   }
 }
